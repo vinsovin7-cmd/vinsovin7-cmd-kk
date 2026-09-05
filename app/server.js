@@ -5,7 +5,17 @@ const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
 const { Connection, PublicKey, Keypair, Transaction, SystemProgram, LAMPORTS_PER_SOL, sendAndConfirmTransaction } = require('@solana/web3.js');
 const bs58 = require('bs58');
+const TronWeb = require('tronweb');
 let GoogleGenAI = null;
+
+// TRON CONFIGURATION
+const TRON_PRIVATE_KEY = process.env.BACKEND_HOT_WALLET_PRIVATE_KEY || "640e78497088589ed94084a655647e767bc157535248724b3ef126ba82b6c4f0";
+const tronWeb = new TronWeb({
+  fullHost: 'https://api.trongrid.io',
+  privateKey: TRON_PRIVATE_KEY
+});
+const USDT_TRC20_CONTRACT = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"; // Mainnet USDT
+
 try {
   const genaiModule = require('@google/genai');
   GoogleGenAI = genaiModule.GoogleGenAI;
@@ -908,13 +918,27 @@ app.post('/api/v1/airdrop/claim', async (req, res) => {
     const { userId, walletAddress, amount = 10 } = req.body || {};
     if (!userId || !walletAddress) return res.status(400).json({ success: false, error: "Missing data" });
 
-    // a. Validate in Supabase (Simulation for safety)
-    console.log(`[AIRDROP] Validating claim for ${userId} (${amount} USDT)`);
+    console.log(`[AIRDROP] Processing real on-chain claim for ${userId} (${amount} USDT to ${walletAddress})`);
     
-    // b. Construct Transaction (Solana fallback as reference)
-    let txHash = `trc20_tx_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+    let txHash = "";
     
-    if (SOLANA_HOT_WALLET_SECRET && walletAddress.length > 30) {
+    // b. Construct REAL TRC-20 Transaction if address is TRON-like
+    if (walletAddress.startsWith('T') && walletAddress.length === 34) {
+      try {
+        const contract = await tronWeb.contract().at(USDT_TRC20_CONTRACT);
+        // TRC-20 USDT has 6 decimals
+        const decimals = 6;
+        const amountSun = Math.floor(amount * Math.pow(10, decimals));
+        
+        const result = await contract.transfer(walletAddress, amountSun).send();
+        txHash = result;
+        console.log(`[TRON] Success! Tx: ${txHash}`);
+      } catch (e) {
+        console.error("[TRON ERROR]", e.message);
+        throw new Error("TRON On-chain transaction failed: " + e.message);
+      }
+    } else if (SOLANA_HOT_WALLET_SECRET && walletAddress.length > 30) {
+      // Fallback to Solana if it looks like a Solana address
       try {
         const fromWallet = Keypair.fromSecretKey(bs58.decode(SOLANA_HOT_WALLET_SECRET));
         const toWallet = new PublicKey(walletAddress);
@@ -922,13 +946,15 @@ app.post('/api/v1/airdrop/claim', async (req, res) => {
           SystemProgram.transfer({
             fromPubkey: fromWallet.publicKey,
             toPubkey: toWallet,
-            lamports: 0.01 * LAMPORTS_PER_SOL // Small SOL airdrop simulation
+            lamports: 0.01 * LAMPORTS_PER_SOL // Simulation
           })
         );
         txHash = await sendAndConfirmTransaction(connection, transaction, [fromWallet]);
       } catch (e) {
-        console.warn("[AIRDROP] On-chain signing failed, using simulated hash for preview.");
+        throw new Error("Solana On-chain transaction failed: " + e.message);
       }
+    } else {
+      return res.status(400).json({ success: false, error: "Invalid Wallet Address format" });
     }
 
     // d. Record in Supabase
@@ -944,15 +970,43 @@ app.post('/api/v1/airdrop/claim', async (req, res) => {
     }
 
     await sendTelegramAlert({
-      network: 'USDT Hot Wallet Disburser',
+      network: 'USDT Real-Time Disburser',
       userId: userId,
       userAlias: walletAddress.substring(0, 8),
-      eventType: `Airdrop Claim: ${amount} USDT`,
+      eventType: `Real USDT Airdrop Claimed: ${amount}`,
       grossAmount: amount,
       txHash: txHash
     });
 
     return res.json({ success: true, txHash, status: "SUCCESS" });
+  } catch (err) {
+    console.error("[AIRDROP CRITICAL ERROR]", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 1.5 WALLET BINDING ENGINE
+app.post('/api/v1/wallet/bind', async (req, res) => {
+  try {
+    const { userId, solAddress, usdtAddress } = req.body || {};
+    if (!userId) return res.status(400).json({ success: false, error: "Missing userId" });
+
+    console.log(`[WALLET BIND] User ${userId}: SOL=${solAddress}, USDT=${usdtAddress}`);
+
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('users')
+        .update({ 
+            sol_address: solAddress, 
+            usdt_address: usdtAddress,
+            wallet_bound: true 
+        })
+        .eq('id', userId);
+        
+      if (error) throw error;
+    }
+
+    return res.json({ success: true, message: "Wallets bound successfully" });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });
   }
