@@ -125,6 +125,24 @@ class TelegramBridge(
     }
 
     @JavascriptInterface
+    fun copyToClipboard(text: String) {
+        try {
+            android.os.Handler(android.os.Looper.getMainLooper()).post {
+                try {
+                    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                    val clip = android.content.ClipData.newPlainText("Sreymara Hub", text)
+                    clipboard.setPrimaryClip(clip)
+                    Toast.makeText(context, "Copied to clipboard!", Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    onLog(LogLevel.ERROR, "Clipboard copy failed: ${e.message}")
+                }
+            }
+        } catch (e: Exception) {
+            onLog(LogLevel.ERROR, "Clipboard copy thread error: ${e.message}")
+        }
+    }
+
+    @JavascriptInterface
     fun openExternalBrowser(url: String) {
         try {
             onLog(LogLevel.BRIDGE, "Opening external browser / intent for: $url")

@@ -22,6 +22,6 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "SREYMARA Executive Hub"
+rootProject.name = "SREYMARA Ecosystem V5.0"
 
 include(":app")

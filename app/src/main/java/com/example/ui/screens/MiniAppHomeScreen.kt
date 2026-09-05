@@ -78,6 +78,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -101,12 +102,12 @@ fun MiniAppHomeScreen(viewModel: MiniAppViewModel) {
     val themeParams by viewModel.themeParams.collectAsState()
     val mainButtonState by viewModel.mainButtonState.collectAsState()
     val hasBackButton by viewModel.hasBackButton.collectAsState()
-    val consoleLogs by viewModel.consoleLogs.collectAsState()
     val activeTab by viewModel.activeTab.collectAsState()
     val alertMessage by viewModel.alertMessage.collectAsState()
     val receivedData by viewModel.receivedData.collectAsState()
 
     val clipboardManager = LocalClipboardManager.current
+    val androidContext = LocalContext.current
 
     val telegramDarkBlue = Color(0xFF17212B)
     val telegramCardBg = Color(0xFF232E3C)
@@ -332,7 +333,7 @@ fun MiniAppHomeScreen(viewModel: MiniAppViewModel) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.BugReport, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Console (${consoleLogs.size})")
+                            Text("Console Logs")
                         }
                     }
                 )
@@ -389,14 +390,17 @@ fun MiniAppHomeScreen(viewModel: MiniAppViewModel) {
                         onThemeChange = { viewModel.updateThemeParams(it) },
                         onCloseToMainHub = { viewModel.setActiveTab(0) }
                     )
-                    3 -> ConsoleTab(
-                        logs = consoleLogs,
-                        receivedData = receivedData,
-                        onClearLogs = { viewModel.clearLogs() },
-                        onClearReceivedData = { viewModel.clearReceivedData() },
-                        onCloseToMainHub = { viewModel.setActiveTab(0) },
-                        clipboardManager = clipboardManager
-                    )
+                    3 -> {
+                        val consoleLogs by viewModel.consoleLogs.collectAsState()
+                        ConsoleTab(
+                            logs = consoleLogs,
+                            receivedData = receivedData,
+                            onClearLogs = { viewModel.clearLogs() },
+                            onClearReceivedData = { viewModel.clearReceivedData() },
+                            onCloseToMainHub = { viewModel.setActiveTab(0) },
+                            clipboardManager = clipboardManager
+                        )
+                    }
                     4 -> GeminiManagerTab(
                         viewModel = viewModel
                     )
@@ -443,18 +447,18 @@ fun MiniAppViewTab(
     val goldLight = Color(0xFFFFF2A1)
 
     Column(modifier = Modifier.fillMaxSize()) {
-        // Simulated Native Executive WebApp Top Header Bar
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(headerBg)
-                .border(width = 1.dp, color = Color(0x55D4AF37))
-                .padding(horizontal = 12.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                if (hasBackButton) {
+        // Show Native Back Bar only when required by WebApp navigation
+        if (hasBackButton) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(headerBg)
+                    .border(width = 1.dp, color = Color(0x55D4AF37))
+                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(
                         onClick = { viewModel.onNativeBackButtonClick() },
                         modifier = Modifier.size(32.dp)
@@ -462,44 +466,21 @@ fun MiniAppViewTab(
                         Text("🦅", fontSize = 16.sp)
                     }
                     Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "BACK TO HUB",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = goldLight
+                    )
                 }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("🛡️", fontSize = 16.sp)
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Column {
-                        Text(
-                            text = "SREYMARA",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = goldLight,
-                            letterSpacing = 2.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Text(
-                            text = "EXECUTIVES WEB2 / WEB3 ECOSYSTEM",
-                            fontSize = 8.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFFE0E0E0),
-                            letterSpacing = 1.sp
-                        )
+                    IconButton(
+                        onClick = { viewModel.reloadToLatestBuild() },
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Text("♾️", fontSize = 16.sp)
                     }
-                }
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(
-                    onClick = { viewModel.reloadToLatestBuild() },
-                    modifier = Modifier.size(32.dp)
-                ) {
-                    Text("♾️", fontSize = 16.sp)
-                }
-                IconButton(
-                    onClick = { viewModel.addLog(LogLevel.INFO, "SREYMARA Menu Options clicked") },
-                    modifier = Modifier.size(32.dp)
-                ) {
-                    Text("🔑", fontSize = 16.sp)
                 }
             }
         }
@@ -584,10 +565,10 @@ fun HtmlEditorTab(
     onCloseToMainHub: () -> Unit,
     clipboardManager: androidx.compose.ui.platform.ClipboardManager
 ) {
-    var isRawEditorActive by remember { mutableStateOf(htmlCode.length <= 30000) }
     var localEditableCode by remember(htmlCode) { 
-        mutableStateOf(if (htmlCode.length <= 30000) htmlCode else htmlCode.take(20000)) 
+        mutableStateOf(htmlCode) 
     }
+    val androidContext = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -683,6 +664,7 @@ fun HtmlEditorTab(
                             if (!clipText.isNullOrEmpty()) {
                                 localEditableCode = clipText
                                 onCodeChange(clipText)
+                                android.util.Log.i("HtmlEditor", "Pasted ${clipText.length} characters")
                             }
                         } catch (e: Exception) {
                             android.util.Log.e("HtmlEditor", "Error pasting: ${e.message}")
@@ -696,6 +678,8 @@ fun HtmlEditorTab(
                     onClick = {
                         try {
                             clipboardManager.setText(AnnotatedString(htmlCode))
+                            android.widget.Toast.makeText(androidContext, "HTML Code Copied to Clipboard", android.widget.Toast.LENGTH_SHORT).show()
+                            android.util.Log.i("HtmlEditor", "Copied ${htmlCode.length} characters")
                         } catch (e: Exception) {
                             android.util.Log.e("HtmlEditor", "Error copying: ${e.message}")
                         }
@@ -718,80 +702,29 @@ fun HtmlEditorTab(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Safe Code Editor / Snippet View
-        if (htmlCode.length > 30000 && !isRawEditorActive) {
-            Card(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
-                shape = RoundedCornerShape(12.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF232E3C))
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "⚡ High-Performance Ecosystem Bundle (${htmlCode.length} chars)",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF10B981)
-                        )
-                        TextButton(
-                            onClick = { isRawEditorActive = true }
-                        ) {
-                            Text("Edit Snippet", fontSize = 11.sp, color = Color(0xFF38BDF8))
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth()
-                            .background(Color(0xFF070B14), RoundedCornerShape(8.dp))
-                            .padding(8.dp)
-                    ) {
-                        Text(
-                            text = htmlCode.take(2500) + "\n\n... [${htmlCode.length - 2500} MORE CHARACTERS RUNNING IN SREYMARA HUB] ...",
-                            fontFamily = FontFamily.Monospace,
-                            fontSize = 11.sp,
-                            color = Color(0xFF94A3B8)
-                        )
-                    }
-                }
-            }
-        } else {
-            // Code TextField for active editable source
-            OutlinedTextField(
-                value = localEditableCode,
-                onValueChange = { newText ->
-                    localEditableCode = newText
-                    onCodeChange(newText)
-                },
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-                textStyle = MaterialTheme.typography.bodySmall.copy(
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 12.sp,
-                    color = Color(0xFFE2E8F0)
-                ),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFF0F172A),
-                    unfocusedContainerColor = Color(0xFF0F172A),
-                    focusedBorderColor = Color(0xFF2481CC),
-                    unfocusedBorderColor = Color(0xFF232E3C)
-                ),
-                shape = RoundedCornerShape(12.dp)
-            )
-        }
+        // Code TextField for active editable source (removed truncation logic)
+        OutlinedTextField(
+            value = localEditableCode,
+            onValueChange = { newText ->
+                localEditableCode = newText
+                onCodeChange(newText)
+            },
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
+            textStyle = MaterialTheme.typography.bodySmall.copy(
+                fontFamily = FontFamily.Monospace,
+                fontSize = 12.sp,
+                color = Color(0xFFE2E8F0)
+            ),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = Color(0xFF0F172A),
+                unfocusedContainerColor = Color(0xFF0F172A),
+                focusedBorderColor = Color(0xFF2481CC),
+                unfocusedBorderColor = Color(0xFF232E3C)
+            ),
+            shape = RoundedCornerShape(12.dp)
+        )
 
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -1027,6 +960,7 @@ fun ConsoleTab(
     onCloseToMainHub: () -> Unit,
     clipboardManager: androidx.compose.ui.platform.ClipboardManager
 ) {
+    val androidContext = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -1107,6 +1041,8 @@ fun ConsoleTab(
                     onClick = {
                         val text = logs.joinToString("\n") { "[${it.timestamp}] [${it.level}] ${it.message}" }
                         clipboardManager.setText(AnnotatedString(text))
+                        android.widget.Toast.makeText(androidContext, "Logs Copied to Clipboard", android.widget.Toast.LENGTH_SHORT).show()
+                        android.util.Log.i("Console", "Copied ${logs.size} logs to clipboard")
                     }
                 ) {
                     Icon(Icons.Default.ContentCopy, contentDescription = "Copy Logs", tint = Color(0xFF64B5F6))

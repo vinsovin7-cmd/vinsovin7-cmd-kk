@@ -92,6 +92,7 @@ fun WebViewContainer(
                 isHorizontalScrollBarEnabled = false
                 isNestedScrollingEnabled = true
                 overScrollMode = WebView.OVER_SCROLL_ALWAYS
+                resumeTimers()
                 settings.apply {
                     javaScriptEnabled = true
                     domStorageEnabled = true
@@ -116,9 +117,9 @@ fun WebViewContainer(
                 isFocusableInTouchMode = true
                 isClickable = true
                 
-                // Use software layer type to avoid missing rendernode crash in headless container
+                // Avoid forcing LAYER_TYPE_HARDWARE which causes MESA DRM render node errors in virtualized/emulator environments
                 try {
-                    setLayerType(android.view.View.LAYER_TYPE_SOFTWARE, null)
+                    setLayerType(android.view.View.LAYER_TYPE_NONE, null)
                 } catch (_: Throwable) {}
 
                 addJavascriptInterface(bridge, "AndroidBridge")

@@ -3,6 +3,7 @@ package com.example.bridge
 import com.example.model.TelegramThemeParams
 import com.example.model.TelegramUser
 import org.json.JSONObject
+import java.net.URLEncoder
 
 object TelegramWebAppJS {
 
@@ -39,7 +40,7 @@ object TelegramWebAppJS {
             put("hash", "e16c802b1156637e61e0f31c34a17937402f1a3a")
         }
 
-        val initDataStr = "query_id=AAHgx10BAAAAAMDHXQE18m-d&user=" + userJson.toString() + "&auth_date=" + (System.currentTimeMillis() / 1000) + "&hash=e16c802b1156637e61e0f31c34a17937402f1a3a"
+        val initDataStr = "query_id=AAHgx10BAAAAAMDHXQE18m-d&user=" + URLEncoder.encode(userJson.toString(), "UTF-8") + "&auth_date=" + (System.currentTimeMillis() / 1000) + "&hash=e16c802b1156637e61e0f31c34a17937402f1a3a"
 
         return """
             (function() {
@@ -205,7 +206,7 @@ object TelegramWebAppJS {
                 };
 
                 const WebApp = {
-                    initData: "${initDataStr}",
+                    initData: ${JSONObject.quote(initDataStr)},
                     initDataUnsafe: ${initDataUnsafe.toString()},
                     version: "7.0",
                     isVersionAtLeast: function(ver) {
