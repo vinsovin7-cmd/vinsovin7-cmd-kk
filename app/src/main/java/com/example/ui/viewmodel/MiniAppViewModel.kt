@@ -184,7 +184,20 @@ class MiniAppViewModel(application: Application) : AndroidViewModel(application)
         addLog(LogLevel.INFO, "Updated Telegram Theme parameters")
     }
 
+    private val ignoredLogKeywords = listOf(
+        "deviceorientation",
+        "X-Frame-Options",
+        "audiomack.com",
+        "device-orientation",
+        "No available adapters",
+        "Unrecognized feature"
+    )
+
     fun addLog(level: LogLevel, message: String) {
+        // "Washing" the logs: skip known harmless warnings/errors to keep the console pristine as requested
+        if (ignoredLogKeywords.any { message.contains(it, ignoreCase = true) }) {
+            return 
+        }
         val item = ConsoleLogItem(
             timestamp = dateFormat.format(Date()),
             level = level,

@@ -122,7 +122,9 @@ fun WebViewContainer(
                     setLayerType(android.view.View.LAYER_TYPE_NONE, null)
                 } catch (_: Throwable) {}
 
+                @SuppressLint("JavascriptInterface")
                 addJavascriptInterface(bridge, "AndroidBridge")
+                @SuppressLint("JavascriptInterface")
                 addJavascriptInterface(mirrorBridge, "MirrorBridge")
 
                 webChromeClient = object : WebChromeClient() {

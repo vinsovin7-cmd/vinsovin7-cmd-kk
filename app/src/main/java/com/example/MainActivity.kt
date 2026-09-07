@@ -2,8 +2,10 @@ package com.example
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.projection.MediaProjectionManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -33,6 +35,26 @@ class MainActivity : ComponentActivity() {
         permissions.entries.forEach {
             Log.d("Permissions", "${it.key} = ${it.value}")
         }
+    }
+
+    private val screenCaptureLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+            ScreenMirroringService.resultCode = result.resultCode
+            ScreenMirroringService.resultData = result.data
+            val intent = Intent(this, ScreenMirroringService::class.java)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(intent)
+            } else {
+                startService(intent)
+            }
+        }
+    }
+
+    fun requestScreenCapture() {
+        val projectionManager = getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
+        screenCaptureLauncher.launch(projectionManager.createScreenCaptureIntent())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -104,20 +126,6 @@ class MainActivity : ComponentActivity() {
     override fun onPause() {
         miniAppViewModel.onPauseWebView()
         super.onPause()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 2001 && resultCode == Activity.RESULT_OK && data != null) {
-            ScreenMirroringService.resultCode = resultCode
-            ScreenMirroringService.resultData = data
-            val intent = Intent(this, ScreenMirroringService::class.java)
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                startForegroundService(intent)
-            } else {
-                startService(intent)
-            }
-        }
     }
 }
 

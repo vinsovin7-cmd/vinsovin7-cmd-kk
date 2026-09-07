@@ -48,6 +48,26 @@ const SOLANA_RPC_URL = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.
 const SOLANA_TOKEN_MINT_ADDRESS = process.env.SOLANA_TOKEN_MINT_ADDRESS || "G9ou5ZV9Uzhy6Bm5CAQBaeXmJxJrHMYGsqCyZFRvhBBh";
 const MASTER_PAYOUT_WALLET_ADDRESS = process.env.MASTER_PAYOUT_WALLET_ADDRESS || "318KbXmKkXm...VbH"; // Updated to Master Beneficiary
 const MASTER_BENEFICIARY_ADDRESS = "318KbXm"; // Master Pot Address
+
+// ----------------------------------------------------
+// AUTOMATED 15-MINUTE RECURRING PAYOUT TRIGGER
+// ----------------------------------------------------
+function initRecurringPayoutTrigger() {
+  const FIFTEEN_MINUTES_MS = 15 * 60 * 1000;
+  setInterval(async () => {
+    try {
+      const dropAmount = (Math.random() * 5 + 1).toFixed(2);
+      await sendTelegramAlert({
+        network: 'Master Nexus Automated Trigger',
+        userId: 'SYSTEM_CRON',
+        userAlias: 'Nexus Drop',
+        eventType: `Recurring 15-Min Yield Drop Triggered`,
+        grossAmount: dropAmount
+      });
+    } catch (err) {}
+  }, FIFTEEN_MINUTES_MS);
+}
+initRecurringPayoutTrigger();
 const TOKEN_NAME = process.env.TOKEN_NAME || "NellyCoins";
 const TOKEN_SYMBOL = process.env.TOKEN_SYMBOL || "NC";
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "AQ.Ab8RN6I16IbZL-FI5IDYSHzLHSbU6tdrY5j_BbiJSR3A2LwW5A";
@@ -205,10 +225,37 @@ Always include specific channel IDs from the list when suggesting channels so th
 // ----------------------------------------------------
 
 // GET /api/user/state?telegramId=7683177085
-app.get('/api/user/state', (req, res) => {
-  const telegramId = req.query.telegramId || MASTER_OWNER_ID;
-  const state = ledger.getUserState(telegramId);
-  return res.json({ success: true, state: state });
+app.get('/api/user/state', async (req, res) => {
+  try {
+    const telegramId = req.query.telegramId || MASTER_OWNER_ID;
+    let state = ledger.getUserState(telegramId);
+
+    // Sync from Supabase if available
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', telegramId)
+        .single();
+      
+      if (data) {
+        state.sol_address = data.sol_address || state.sol_address;
+        state.usdt_address = data.usdt_address || state.usdt_address;
+        state.balanceUsd = data.balance !== undefined ? data.balance : state.balanceUsd;
+        // Merge back to ledger memory
+        ledger.updateUserState(telegramId, {
+          balanceUsd: state.balanceUsd,
+          solVaultBalance: state.sol_address ? state.solVaultBalance : 0
+        });
+      }
+    }
+
+    return res.json({ success: true, state: state });
+  } catch (err) {
+    console.error("[STATE SYNC ERROR]", err.message);
+    const telegramId = req.query.telegramId || MASTER_OWNER_ID;
+    return res.json({ success: true, state: ledger.getUserState(telegramId) });
+  }
 });
 
 // POST /api/user/update-balance

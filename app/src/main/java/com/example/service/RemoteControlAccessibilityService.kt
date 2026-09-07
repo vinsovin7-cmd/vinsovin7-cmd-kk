@@ -23,8 +23,12 @@ class RemoteControlAccessibilityService : AccessibilityService() {
     override fun onServiceConnected() {
         super.onServiceConnected()
         val filter = IntentFilter("com.example.REMOTE_CONTROL_EVENT")
-        // Specify RECEIVER_NOT_EXPORTED for internal app communication (Android 14+)
-        registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
+        androidx.core.content.ContextCompat.registerReceiver(
+            this,
+            receiver,
+            filter,
+            androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED
+        )
         Log.d("RemoteControl", "Accessibility Service Connected and Listening for Events")
     }
 

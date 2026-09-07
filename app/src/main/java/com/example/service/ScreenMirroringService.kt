@@ -92,6 +92,7 @@ class ScreenMirroringService : Service() {
         Log.d("MirrorService", "Received Remote Input: $payload")
         // Logic to relay to AccessibilityService
         val intent = Intent("com.example.REMOTE_CONTROL_EVENT")
+        intent.setPackage(packageName)
         intent.putExtra("payload", payload)
         sendBroadcast(intent)
     }
@@ -117,7 +118,12 @@ class ScreenMirroringService : Service() {
         peerConnection?.close()
         peerConnectionFactory?.dispose()
         isRunning = false
-        stopForeground(true)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        } else {
+            @Suppress("DEPRECATION")
+            stopForeground(true)
+        }
         stopSelf()
     }
 

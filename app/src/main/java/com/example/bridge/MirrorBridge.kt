@@ -1,18 +1,16 @@
 package com.example.bridge
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.media.projection.MediaProjectionManager
 import android.webkit.JavascriptInterface
+import com.example.MainActivity
 import com.example.service.ScreenMirroringService
 
-class MirrorBridge(private val context: Context, private val activity: Activity) {
+class MirrorBridge(private val context: Context, private val activity: MainActivity) {
 
     @JavascriptInterface
     fun startMirroring() {
-        val projectionManager = context.getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
-        activity.startActivityForResult(projectionManager.createScreenCaptureIntent(), 2001)
+        activity.requestScreenCapture()
     }
 
     @JavascriptInterface
