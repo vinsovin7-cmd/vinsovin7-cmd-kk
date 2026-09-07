@@ -865,6 +865,50 @@ fun ConfigTab(
         }
 
         item {
+            Card(
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
+                shape = RoundedCornerShape(12.dp),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF388BFF)),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(androidx.compose.material.icons.Icons.Default.Smartphone, contentDescription = null, tint = Color(0xFF388BFF), modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("DESKTOP MIRRORING & WIDE MODE", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    }
+                    Text(
+                        text = "Connect from your PC to view the ecosystem in full wide-screen desktop mode. Use the URL below:",
+                        fontSize = 11.sp,
+                        color = Color(0xFF94A3B8)
+                    )
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF060810)),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "https://ais-pre-bwexs5e5rog7yp3ntq53ux-152195627325.asia-east1.run.app",
+                            fontSize = 10.sp,
+                            color = Color(0xFF388BFF),
+                            modifier = Modifier.padding(12.dp),
+                            fontFamily = FontFamily.Monospace
+                        )
+                    }
+                    Button(
+                        onClick = {
+                            // User can copy or use the URL
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388BFF)),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text("Mirroring Active", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                    }
+                }
+            }
+        }
+
+        item {
             Text(
                 text = "Telegram Theme Parameters",
                 fontSize = 16.sp,

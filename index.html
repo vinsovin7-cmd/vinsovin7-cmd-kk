@@ -8426,6 +8426,11 @@ print(json.dumps(res, indent=2))</pre>
 
     // Call load on start
     window.addEventListener('load', () => {
+        // Auto-enable desktop mode for web-hosted mirror
+        if (window.location.protocol.startsWith('http') && !window.Telegram?.WebApp?.platform?.includes('mobile')) {
+            document.body.classList.add('desktop-mode');
+        }
+        
         if (localStorage.getItem('sreymara_desktop_mode') === 'true') {
             document.body.classList.add('desktop-mode');
         }

@@ -267,9 +267,10 @@ fun LinuxBrowserTab(viewModel: MiniAppViewModel) {
             modifier = Modifier.padding(bottom = 8.dp)
         ) {
             val presets = listOf(
+                "📧 Mail.com" to "https://www.mail.com",
+                "🕵️ IX Stealth" to "https://www.startpage.com",
+                "🇺🇸 US Proxy" to "https://www.google.com/search?q=free+us+proxy+browser",
                 "📚 Wikipedia" to "https://www.wikipedia.org",
-                "🖼️ Unsplash Photos" to "https://unsplash.com",
-                "🎥 Pexels Videos" to "https://www.pexels.com",
                 "🏛️ Archive" to "https://archive.org",
                 "🔍 Bing" to "https://bing.com"
             )
