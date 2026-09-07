@@ -589,18 +589,46 @@
       pointer-events: none;
       z-index: 1;
     }
-    /* Desktop Optimization */
+    /* Desktop Optimization (FULL WIDE CANVAS) */
     body.desktop-mode {
-      max-width: 1200px;
-      margin: 0 auto;
-      border-left: 1px solid #1a1e2e;
-      border-right: 1px solid #1a1e2e;
-      box-shadow: 0 0 100px rgba(0,0,0,0.8);
-      transform: scale(0.95);
-      transform-origin: top center;
+      max-width: 100%;
+      margin: 0;
+      border: none;
+      box-shadow: none;
+      transform: none;
     }
     body.desktop-mode .main-viewport {
-      padding: 20px;
+      padding: 24px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+    body.desktop-mode #view-dashboard {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+    body.desktop-mode #view-dashboard > section {
+      grid-column: span 2;
+    }
+    body.desktop-mode #node-central-engine {
+      grid-column: span 2; /* AI Engine gets full width in the grid */
+    }
+    body.desktop-mode #node-ad-network,
+    body.desktop-mode #node-vault,
+    body.desktop-mode #node-permissions {
+      grid-column: span 1;
+    }
+    body.desktop-mode #node-executive-api {
+      max-width: 1600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    body.desktop-mode #airdropWidget {
+      top: 100px !important;
+      right: 40px !important;
+      left: auto !important;
+      transform: scale(1.3);
     }
     body.desktop-mode #view-dashboard .grid {
       grid-template-columns: repeat(2, 1fr);
@@ -925,7 +953,7 @@
             <span class="text-[9px] bg-yellow-950 text-yellow-300 border border-yellow-500/30 px-2 py-0.5 rounded font-mono font-bold">PRODUCTION LINK</span>
           </div>
           
-          <div class="grid grid-cols-1 gap-3">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
             <div class="space-y-1.5">
               <label class="text-[9px] text-gray-500 uppercase font-black block">SOLANA (SOL) PAYOUT ADDRESS</label>
               <div class="flex gap-2">
