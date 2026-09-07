@@ -646,9 +646,19 @@
     }
     body.desktop-mode .main-viewport {
       padding: 24px;
-      max-width: 1600px;
-      margin: 0 auto;
+      max-width: 100%;
+      margin: 0;
     }
+    /* Expand all narrow containers in desktop mode */
+    body.desktop-mode .main-viewport > .mx-auto,
+    body.desktop-mode .tab-view .mx-auto,
+    body.desktop-mode #ai-studio-modal .mx-auto,
+    body.desktop-mode .max-w-md,
+    body.desktop-mode .max-w-sm,
+    body.desktop-mode .max-w-2xl {
+      max-width: 100% !important;
+    }
+
     body.desktop-mode #view-dashboard {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
