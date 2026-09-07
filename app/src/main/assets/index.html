@@ -7655,6 +7655,16 @@ print(json.dumps(res, indent=2))</pre>
     }
 
     function loadEcosystemState() {
+      // MASTER RECOVERY: If first time on web or state lost, initialize with executive seeds
+      if (!localStorage.getItem('sreymara_ecosystem_state')) {
+          console.log("[SREYMARA WEB] Recovering Executive Monetization Streams...");
+          const recoveryState = SreymaraDB.getStaticFallback();
+          recoveryState.wallet = 1842.50; 
+          recoveryState.engine = 1248.50;
+          recoveryState.ads = 594.00;
+          SreymaraDB.safeSave('sreymara_ecosystem_state', recoveryState);
+      }
+
       let state;
       if (typeof SreymaraDB !== 'undefined') {
         state = SreymaraDB.safeParse('sreymara_ecosystem_state', SreymaraDB.getStaticFallback());
@@ -8426,6 +8436,14 @@ print(json.dumps(res, indent=2))</pre>
 
     // Call load on start
     window.addEventListener('load', () => {
+        // Auto-enable desktop mode for web-hosted mirrors (Vercel/GitHub)
+        const isWeb = window.location.protocol.startsWith('http');
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        if (isWeb && !isMobile) {
+            document.body.classList.add('desktop-mode');
+        }
+
         if (localStorage.getItem('sreymara_desktop_mode') === 'true') {
             document.body.classList.add('desktop-mode');
         }
