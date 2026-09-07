@@ -94,6 +94,15 @@
 
     function cleanupEcosystemErrors() {
         console.log("[SREYMARA] Triggering Deep Cleanup & Recovery...");
+        
+        // Hide the diagnostic hub overlay
+        const overlay = document.getElementById('sreymara-error-overlay');
+        if (overlay) overlay.classList.add('hidden');
+        
+        // Clear error logs
+        const logs = document.getElementById('error-logs');
+        if (logs) logs.innerHTML = '';
+
         const blackBox = document.querySelector('.black-container-error');
         if (blackBox) blackBox.style.display = 'none';
         
@@ -205,6 +214,28 @@
     window.addEventListener('unhandledrejection', function(e) {
       e.preventDefault();
     });
+
+    function handleAudiomackError() {
+      const restrictedOverlay = document.getElementById('audiomack-restricted');
+      if (restrictedOverlay) {
+        restrictedOverlay.classList.remove('hidden');
+        console.log("%c[SREYMARA WASHER] Audiomack Frame Options Handled Successfully.", "color: #10B981; font-weight: bold;");
+      }
+    }
+
+    function checkAudiomackLoad() {
+      setTimeout(() => {
+        try {
+          const frame = document.getElementById('audiomack-frame');
+          if (!frame || frame.src === "about:blank") {
+             handleAudiomackError();
+          }
+        } catch (e) {
+          // Cross-origin restriction confirmed
+          handleAudiomackError();
+        }
+      }, 2000);
+    }
 
     tailwind.config = {
       theme: {
@@ -5493,27 +5524,6 @@ print(json.dumps(res, indent=2))</pre>
         .replace(/'/g, '&#039;');
     }
 
-    function handleAudiomackError() {
-      const restrictedOverlay = document.getElementById('audiomack-restricted');
-      if (restrictedOverlay) {
-        restrictedOverlay.classList.remove('hidden');
-        console.log("%c[SREYMARA WASHER] Audiomack Frame Options Handled Successfully.", "color: #10B981; font-weight: bold;");
-      }
-    }
-
-    function checkAudiomackLoad() {
-      setTimeout(() => {
-        try {
-          const frame = document.getElementById('audiomack-frame');
-          if (!frame || frame.src === "about:blank") {
-             handleAudiomackError();
-          }
-        } catch (e) {
-          // Cross-origin restriction confirmed
-          handleAudiomackError();
-        }
-      }, 2000);
-    }
 
     function openAudiomackSafe() {
       const url = "https://audiomack.com/login";
@@ -8223,6 +8233,8 @@ print(json.dumps(res, indent=2))</pre>
         console.log("Dispatching AI Task:", msg);
         // We'll rely on the user manually copying from Gemini for now or automated insertion if bridge allows
     }
+
+    function claimDailyReward() {
       if (dailyStakingClaimed) {
         toast('Daily Staking Reward already claimed today.', '⚠️');
         return;

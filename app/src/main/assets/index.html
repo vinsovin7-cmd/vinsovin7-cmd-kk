@@ -92,26 +92,62 @@
         }
     };
 
-    function cleanupEcosystemErrors() {
-        console.log("[SREYMARA] Triggering Deep Cleanup & Recovery...");
-        const blackBox = document.querySelector('.black-container-error');
-        if (blackBox) blackBox.style.display = 'none';
-        
-        const viewport = document.querySelector('.main-viewport');
-        if (viewport) {
-            viewport.style.display = 'flex';
-            viewport.style.opacity = '1';
+    function toast(msg, icon = '✨') {
+        const container = document.getElementById('toast-container');
+        if (!container) {
+            console.log(`[SREYMARA TOAST]: ${icon} ${msg}`);
+            return;
         }
+        const t = document.createElement('div');
+        t.className = "bg-luxuryGold/95 text-black px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-3 shadow-2xl animate-bounce-in border border-white/20";
+        t.innerHTML = `<span>${icon}</span><span class="tracking-tight">${msg}</span>`;
+        container.appendChild(t);
+        setTimeout(() => {
+            t.classList.add('animate-fade-out');
+            setTimeout(() => t.remove(), 500);
+        }, 3000);
+    }
 
-        loadEcosystemState();
+    let isRestoring = false;
+    function cleanupEcosystemErrors() {
+        if (isRestoring) return;
+        isRestoring = true;
+        console.log("[SREYMARA] Triggering Deep Cleanup & Recovery...");
         
-        const statusEl = document.getElementById('system-status');
-        if (statusEl) {
-            statusEl.innerText = "● System Healthy";
-            statusEl.classList.remove('text-rose-400');
-            statusEl.classList.add('text-emerald-400');
+        try {
+            // Hide the diagnostic hub overlay
+            const overlay = document.getElementById('sreymara-error-overlay');
+            if (overlay) overlay.classList.add('hidden');
+            
+            // Clear error logs
+            const logs = document.getElementById('error-logs');
+            if (logs) logs.innerHTML = '';
+
+            const blackBox = document.querySelector('.black-container-error');
+            if (blackBox) blackBox.style.display = 'none';
+            
+            const viewport = document.querySelector('.main-viewport');
+            if (viewport) {
+                viewport.style.display = 'flex';
+                viewport.style.opacity = '1';
+            }
+
+            if (typeof loadEcosystemState === 'function') {
+                loadEcosystemState();
+            }
+            
+            const statusEl = document.getElementById('system-status');
+            if (statusEl) {
+                statusEl.innerText = "● System Healthy";
+                statusEl.classList.remove('text-rose-400');
+                statusEl.classList.add('text-emerald-400');
+            }
+            toast('Ecosystem Restoration Complete', '🛡️');
+        } catch (e) {
+            console.error("Cleanup failed:", e);
+        } finally {
+            setTimeout(() => { isRestoring = false; }, 2000);
         }
-        toast('Ecosystem Restoration Complete', '🛡️');
     }
 
     /*
@@ -154,13 +190,20 @@
         originalConsoleWarn.apply(console, args);
     };
 
+    let lastErrorTime = 0;
     window.onerror = function(msg, url, line, col, error) {
         if (typeof SreymaraErrorWasher !== 'undefined' && SreymaraErrorWasher.wash(msg)) return true;
         console.error('SREYMARA EXECUTIVE INTERCEPT:', msg, 'at', line, ':', col);
         showErrorInOverlay(`[System Kernel Error] ${msg} (at line ${line})`);
         
-        // Auto-recovery: try to clear any blocking overlays
-        cleanupEcosystemErrors();
+        // Auto-recovery: try to clear any blocking overlays, with rate limiting
+        const now = Date.now();
+        if (now - lastErrorTime > 5000) {
+            lastErrorTime = now;
+            if (typeof cleanupEcosystemErrors === 'function') {
+                cleanupEcosystemErrors();
+            }
+        }
         return true; 
     };
 
@@ -414,8 +457,7 @@
       cursor: pointer;
       box-shadow: 0 0 25px rgba(255, 215, 0, 0.8);
       z-index: 999;
-      animation: floatMotion 120s infinite alternate ease-in-out, 
-                 glitterBlink 3s infinite alternate ease-in-out,
+      animation: glitterBlink 3s infinite alternate ease-in-out,
                  rainbowGlow 180s infinite linear;
       overflow: hidden;
       transition: background-color 2s ease;
@@ -5700,17 +5742,6 @@ print(json.dumps(res, indent=2))</pre>
       }, 100);
     }
 
-    function toast(msg, icon = '✨') {
-      const el = document.createElement('div');
-      el.className = 'fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-luxuryGold text-black px-3 py-1.5 rounded-xl text-[10px] font-bold shadow-2xl transition-opacity duration-300 border border-yellow-300 whitespace-nowrap flex items-center gap-1.5';
-      el.innerText = `${icon} ${msg}`;
-      document.body.appendChild(el);
-      setTimeout(() => { 
-        el.style.opacity = '0'; 
-        setTimeout(() => el.remove(), 300); 
-      }, 2200);
-    }
-
     function handleSubNavClick(type) {
       if (type === 'editor') {
         toast('HTML Editor: Native Code Mirror active', '💻');
@@ -7791,29 +7822,33 @@ print(json.dumps(res, indent=2))</pre>
     }
 
     function updateAllDisplays() {
-      // Update Executive API Key display
-      const apiKeyEl = document.getElementById('executive-api-key-display');
-      if (apiKeyEl) apiKeyEl.innerText = SreymaraDB.getApiKey();
+      try {
+        // Update Executive API Key display
+        const apiKeyEl = document.getElementById('executive-api-key-display');
+        if (apiKeyEl) apiKeyEl.innerText = SreymaraDB.getApiKey();
 
-      if (document.getElementById('walletBal')) document.getElementById('walletBal').innerText = `${nexusWalletBalance.toFixed(2)} USDT`;
-      if (document.getElementById('sol-yield-val')) document.getElementById('sol-yield-val').innerText = `$${solanaYield.toFixed(2)}`;
-      if (document.getElementById('usdt-yield-val')) document.getElementById('usdt-yield-val').innerText = `$${usdtYield.toFixed(2)}`;
-      if (document.getElementById('dashboard-sol-yield')) document.getElementById('dashboard-sol-yield').innerText = `${solanaYield.toFixed(3)} SOL`;
-      if (document.getElementById('dashboard-usdt-yield')) document.getElementById('dashboard-usdt-yield').innerText = `$${usdtYield.toFixed(2)} USDT`;
-      if (document.getElementById('global-total-revenue')) document.getElementById('global-total-revenue').innerText = `$${(nexusWalletBalance + solanaYield + usdtYield).toFixed(2)} USDT`;
-      if (document.getElementById('airdrop-pot-value')) document.getElementById('airdrop-pot-value').innerText = `$${airdropPot.toFixed(2)}`;
-      if (document.getElementById('bing-rewards-bal')) document.getElementById('bing-rewards-bal').innerText = `${bingRewardsPoints} Points`;
-      if (document.getElementById('music-earnings-bal')) document.getElementById('music-earnings-bal').innerText = `$${musicEarnings.toFixed(2)}`;
-      if (document.getElementById('stakedAmt')) document.getElementById('stakedAmt').innerText = `${nexusStakedAmount.toFixed(2)} USDT`;
-      
-      // Update Master Vault Modal yields
-      const ownerPool = (nexusWalletBalance * 0.8).toFixed(2);
-      const userPool = (nexusWalletBalance * 0.2).toFixed(2);
-      if (document.getElementById('modal-owner-pool')) document.getElementById('modal-owner-pool').innerText = `$${ownerPool} USDT`;
-      if (document.getElementById('modal-user-pool')) document.getElementById('modal-user-pool').innerText = `$${userPool} USDT`;
-      if (document.getElementById('modal-total-yield')) document.getElementById('modal-total-yield').innerText = `$${nexusWalletBalance.toFixed(2)} USDT`;
+        if (document.getElementById('walletBal')) document.getElementById('walletBal').innerText = `${nexusWalletBalance.toFixed(2)} USDT`;
+        if (document.getElementById('sol-yield-val')) document.getElementById('sol-yield-val').innerText = `$${solanaYield.toFixed(2)}`;
+        if (document.getElementById('usdt-yield-val')) document.getElementById('usdt-yield-val').innerText = `$${usdtYield.toFixed(2)}`;
+        if (document.getElementById('dashboard-sol-yield')) document.getElementById('dashboard-sol-yield').innerText = `${solanaYield.toFixed(3)} SOL`;
+        if (document.getElementById('dashboard-usdt-yield')) document.getElementById('dashboard-usdt-yield').innerText = `$${usdtYield.toFixed(2)} USDT`;
+        if (document.getElementById('global-total-revenue')) document.getElementById('global-total-revenue').innerText = `$${(nexusWalletBalance + solanaYield + usdtYield).toFixed(2)} USDT`;
+        if (document.getElementById('airdrop-pot-value')) document.getElementById('airdrop-pot-value').innerText = `$${airdropPot.toFixed(2)}`;
+        if (document.getElementById('bing-rewards-bal')) document.getElementById('bing-rewards-bal').innerText = `${bingRewardsPoints} Points`;
+        if (document.getElementById('music-earnings-bal')) document.getElementById('music-earnings-bal').innerText = `$${musicEarnings.toFixed(2)}`;
+        if (document.getElementById('stakedAmt')) document.getElementById('stakedAmt').innerText = `${nexusStakedAmount.toFixed(2)} USDT`;
+        
+        // Update Master Vault Modal yields
+        const ownerPool = (nexusWalletBalance * 0.8).toFixed(2);
+        const userPool = (nexusWalletBalance * 0.2).toFixed(2);
+        if (document.getElementById('modal-owner-pool')) document.getElementById('modal-owner-pool').innerText = `$${ownerPool} USDT`;
+        if (document.getElementById('modal-user-pool')) document.getElementById('modal-user-pool').innerText = `$${userPool} USDT`;
+        if (document.getElementById('modal-total-yield')) document.getElementById('modal-total-yield').innerText = `$${nexusWalletBalance.toFixed(2)} USDT`;
 
-      updateUnreadBadges();
+        updateUnreadBadges();
+      } catch (e) {
+        console.warn("Update All Displays failed:", e);
+      }
     }
 
     function updateUnreadBadges() {
@@ -8245,6 +8280,8 @@ print(json.dumps(res, indent=2))</pre>
         console.log("Dispatching AI Task:", msg);
         // We'll rely on the user manually copying from Gemini for now or automated insertion if bridge allows
     }
+
+    function claimDailyReward() {
       if (dailyStakingClaimed) {
         toast('Daily Staking Reward already claimed today.', '⚠️');
         return;
@@ -8497,8 +8534,12 @@ print(json.dumps(res, indent=2))</pre>
         if (localStorage.getItem('sreymara_desktop_mode') === 'true') {
             document.body.classList.add('desktop-mode');
         }
-      loadEcosystemState();
-      initAudioEngine();
+        if (typeof loadEcosystemState === 'function') {
+            loadEcosystemState();
+        }
+        if (typeof initAudioEngine === 'function') {
+            initAudioEngine();
+        }
       
       // 24H Notification Auto-Cleanup Logic
       setInterval(() => {
