@@ -638,48 +638,56 @@
     }
     /* Desktop Optimization (FULL WIDE CANVAS) */
     body.desktop-mode {
-      max-width: 100%;
-      margin: 0;
+      max-width: 100% !important;
+      margin: 0 !important;
       border: none;
       box-shadow: none;
       transform: none;
+      width: 100vw !important;
     }
-    body.desktop-mode .main-viewport {
-      padding: 24px;
-      max-width: 100%;
-      margin: 0;
+    body.desktop-mode #main-content-wrapper {
+      max-width: 100% !important;
+      width: 100% !important;
+      margin: 0 !important;
+      padding: 24px 40px !important;
     }
     /* Expand all narrow containers in desktop mode */
-    body.desktop-mode .main-viewport > .mx-auto,
+    body.desktop-mode .mx-auto,
     body.desktop-mode .tab-view .mx-auto,
     body.desktop-mode #ai-studio-modal .mx-auto,
     body.desktop-mode .max-w-md,
     body.desktop-mode .max-w-sm,
-    body.desktop-mode .max-w-2xl {
+    body.desktop-mode .max-w-xl,
+    body.desktop-mode .max-w-2xl,
+    body.desktop-mode .max-w-4xl,
+    body.desktop-mode .max-w-6xl {
       max-width: 100% !important;
+      width: 100% !important;
     }
 
     body.desktop-mode #view-dashboard {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 24px !important;
       align-items: start;
+      width: 100% !important;
     }
-    body.desktop-mode #view-dashboard > section {
-      grid-column: span 2;
-    }
+    body.desktop-mode #view-dashboard > section,
     body.desktop-mode #node-central-engine {
-      grid-column: span 2; /* AI Engine gets full width in the grid */
+      grid-column: span 3 !important;
     }
     body.desktop-mode #node-ad-network,
     body.desktop-mode #node-vault,
-    body.desktop-mode #node-permissions {
-      grid-column: span 1;
+    body.desktop-mode #node-permissions,
+    body.desktop-mode #node-executive-api {
+      grid-column: span 1 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      margin: 0 !important;
     }
     body.desktop-mode #node-executive-api {
-      max-width: 1600px;
-      margin-left: auto;
-      margin-right: auto;
+      max-width: 100% !important;
+      margin-top: 0 !important;
     }
     body.desktop-mode #airdropWidget {
       top: 100px !important;
@@ -905,7 +913,7 @@
     </div>
   </div>
 
-  <div class="w-full max-w-md mx-auto px-3 mt-3 space-y-4">
+  <div id="main-content-wrapper" class="w-full max-w-md mx-auto px-3 mt-3 space-y-4">
 
     <!-- TELEGRAM AUTH OVERLAY -->
     <div id="authOverlay" class="fixed inset-0 bg-cyberBlack z-[1000] justify-center items-center p-6 hidden">
@@ -4760,6 +4768,30 @@
   </div>
 
   <script>
+    // [V5.0 EXECUTIVE SAFETY] FORCED LOAD COMPLETION ENGINE
+    // Executes immediately to prevent hanging browser spinners
+    (function() {
+        const safetyTimeout = setTimeout(() => {
+            console.log("[SREYMARA] Executing Forced Load Completion Safety...");
+            window.stop();
+            const statusPill = document.getElementById('system-status');
+            if (statusPill) {
+                statusPill.innerText = "● SYSTEM STABLE";
+                statusPill.classList.replace('animate-pulse', 'opacity-100');
+            }
+        }, 15000); // 15 seconds limit for all resources
+        
+        window.addEventListener('load', () => {
+            clearTimeout(safetyTimeout);
+            console.log("[SREYMARA] Ecosystem Load Success.");
+            const statusPill = document.getElementById('system-status');
+            if (statusPill) {
+                statusPill.innerText = "● SYSTEM STABLE";
+                statusPill.classList.replace('animate-pulse', 'opacity-100');
+            }
+        });
+    })();
+
     // =========================================================================
     // LUXURY WORLD HUB & SEARCHLIGHT SYSTEM
     // =========================================================================
@@ -8533,17 +8565,6 @@ print(json.dumps(res, indent=2))</pre>
 
     // Call load on start
     window.addEventListener('load', () => {
-        // FORCED LOAD COMPLETION SAFETY: Stops the browser tab spinner if resources hang
-        setTimeout(() => {
-            console.log("[SREYMARA] Executing Forced Load Completion Safety...");
-            window.stop();
-            const statusPill = document.getElementById('system-status');
-            if (statusPill) {
-                statusPill.innerText = "● SYSTEM STABLE";
-                statusPill.classList.replace('animate-pulse', 'opacity-100');
-            }
-        }, 10000);
-
         // Lazy-load iframes to prevent initial tab spinner hang
         const tvPlayer = document.getElementById('tvPlayer');
         if (tvPlayer && tvPlayer.dataset.src) tvPlayer.src = tvPlayer.dataset.src;
