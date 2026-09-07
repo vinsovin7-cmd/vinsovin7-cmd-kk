@@ -154,13 +154,14 @@
         originalConsoleWarn.apply(console, args);
     };
 
-    window.onerror = function(msg, url, line) {
-        if (SreymaraErrorWasher.wash(msg)) return true;
-        console.warn('Intercepted UI Error:', msg);
-        showErrorInOverlay(`[Runtime] ${msg} (at ${line})`);
-        const blackBox = document.querySelector('.black-container-error');
-        if (blackBox) blackBox.style.display = 'none';
-        return true;
+    window.onerror = function(msg, url, line, col, error) {
+        if (typeof SreymaraErrorWasher !== 'undefined' && SreymaraErrorWasher.wash(msg)) return true;
+        console.error('SREYMARA EXECUTIVE INTERCEPT:', msg, 'at', line, ':', col);
+        showErrorInOverlay(`[System Kernel Error] ${msg} (at line ${line})`);
+        
+        // Auto-recovery: try to clear any blocking overlays
+        cleanupEcosystemErrors();
+        return true; 
     };
 
     function showErrorInOverlay(msg) {
@@ -168,12 +169,14 @@
         if (!overlay) return;
         overlay.classList.remove('hidden');
         
-        const logs = document.getElementById('error-logs');
+        const logs = document.getElementById('error-logs') || overlay;
         const log = document.createElement('div');
-        log.className = "text-rose-400 border-l border-rose-500 pl-1 mb-1 break-all";
-        log.innerText = msg;
-        logs.appendChild(log);
-        logs.scrollTop = logs.scrollHeight;
+        log.className = "text-rose-400 border-l border-rose-500 pl-1 mb-1 break-all font-mono text-[9px]";
+        log.innerText = `> ${msg}`;
+        if (logs.appendChild) {
+            logs.appendChild(log);
+            logs.scrollTop = logs.scrollHeight;
+        }
 
         const statusEl = document.getElementById('system-status');
         if (statusEl) {
@@ -195,14 +198,14 @@
     console.clear();
     console.log("%c SREYMARA EXECUTIVE ENGINE: REPAIRED & OPTIMIZED ", "background: #D4AF37; color: black; font-weight: bold; padding: 5px;");
     
-    window.onerror = function(message, source, lineno, colno, error) {
-      console.warn("Handled runtime warning:", message, "line:", lineno);
-      return true; // Prevent any unhandled error from blocking DOM or tabs
-    };
+    // Ensure error handling is consistent
     window.addEventListener('error', function(e) {
+      if (typeof SreymaraErrorWasher !== 'undefined' && SreymaraErrorWasher.wash(e.message)) return;
+      console.warn("Handled runtime warning:", e.message);
       e.preventDefault();
     });
     window.addEventListener('unhandledrejection', function(e) {
+      console.warn("Handled promise rejection:", e.reason);
       e.preventDefault();
     });
 
@@ -397,6 +400,8 @@
       position: fixed;
       width: 55px;
       height: 55px;
+      bottom: 120px;
+      right: 15px;
       background: radial-gradient(circle, #ffd700 0%, #b8860b 100%);
       border: 2px solid #fff;
       border-radius: 50%;
@@ -6070,10 +6075,22 @@ print(json.dumps(res, indent=2))</pre>
       // Re-render feed based on tab
       const stream = document.getElementById('sirimira-posts-stream');
       if (stream) {
-        stream.innerHTML = '<div class="text-center py-10"><span class="animate-spin text-2xl inline-block">🔄</span><p class="text-xs text-gray-400 mt-2 font-bold uppercase tracking-widest">Optimizing ' + subTab.toUpperCase() + ' Feed...</p></div>';
+        // Clear everything EXCEPT the dynamic posts target and the discover button
+        const dynamicTarget = document.getElementById('dynamic-sirimira-posts');
+        const discoverBtn = stream.querySelector('.text-center.pt-2.pb-6');
+        
+        // Wipe stream
+        stream.innerHTML = '<div id="sirimira-spinner" class="text-center py-10"><span class="animate-spin text-2xl inline-block">🔄</span><p class="text-xs text-gray-400 mt-2 font-bold uppercase tracking-widest">Optimizing ' + subTab.toUpperCase() + ' Feed...</p></div>';
+        
+        // Restore essential structure after clear
+        if (dynamicTarget) stream.appendChild(dynamicTarget);
+        if (discoverBtn) stream.appendChild(discoverBtn);
+
         setTimeout(() => {
+          const spinner = document.getElementById('sirimira-spinner');
+          if (spinner) spinner.remove();
           loadMoreSirimiraPosts(true);
-        }, 600);
+        }, 800);
       }
 
       toast(`Switched to Sirimira ${subTab.toUpperCase()} feed`, '🪐');
@@ -7683,48 +7700,53 @@ print(json.dumps(res, indent=2))</pre>
     }
 
     function loadEcosystemState() {
-      // MASTER RECOVERY: If first time on web or state lost, initialize with executive seeds
-      if (!localStorage.getItem('sreymara_ecosystem_state')) {
-          console.log("[SREYMARA WEB] Recovering Executive Monetization Streams...");
-          const recoveryState = SreymaraDB.getStaticFallback();
-          recoveryState.wallet = 1842.50; 
-          recoveryState.engine = 1248.50;
-          recoveryState.ads = 594.00;
-          SreymaraDB.safeSave('sreymara_ecosystem_state', recoveryState);
-      }
+      try {
+        // MASTER RECOVERY: If first time on web or state lost, initialize with executive seeds
+        if (!localStorage.getItem('sreymara_ecosystem_state')) {
+            console.log("[SREYMARA WEB] Recovering Executive Monetization Streams...");
+            const recoveryState = SreymaraDB.getStaticFallback();
+            recoveryState.wallet = 1842.50; 
+            recoveryState.engine = 1248.50;
+            recoveryState.ads = 594.00;
+            SreymaraDB.safeSave('sreymara_ecosystem_state', recoveryState);
+        }
 
-      let state;
-      if (typeof SreymaraDB !== 'undefined') {
-        state = SreymaraDB.safeParse('sreymara_ecosystem_state', SreymaraDB.getStaticFallback());
-      } else {
-        const saved = localStorage.getItem('sreymara_ecosystem_state');
-        state = saved ? JSON.parse(saved) : {};
-      }
-      
-      nexusWalletBalance = state.wallet || 0;
-      solanaYield = state.solanaYield || 0;
-      usdtYield = state.usdtYield || 0;
-      nexusEngineRevenue = state.engine || 1248.50;
-      nexusAdRevenue = state.ads || 892.10;
-      nexusStakedAmount = state.staked || 0;
-      airdropPot = state.pot || 0;
-      bingRewardsPoints = state.bing || 0;
-      musicEarnings = state.music || 0;
-      dailyStakingClaimed = state.daily || false;
-      masterWalletBound = state.isBound || false;
-      masterWalletAddress = state.address || "";
-      solWalletAddress = state.solAddress || "";
-      usdtWalletAddress = state.usdtAddress || "";
-      
-      // Populate inputs
-      setTimeout(() => {
-        const solInput = document.getElementById('sol-wallet-input');
-        const usdtInput = document.getElementById('usdt-wallet-input');
-        if (solInput) solInput.value = solWalletAddress;
-        if (usdtInput) usdtInput.value = usdtWalletAddress;
-      }, 500);
+        let state;
+        if (typeof SreymaraDB !== 'undefined') {
+          state = SreymaraDB.safeParse('sreymara_ecosystem_state', SreymaraDB.getStaticFallback());
+        } else {
+          const saved = localStorage.getItem('sreymara_ecosystem_state');
+          state = saved ? JSON.parse(saved) : {};
+        }
+        
+        nexusWalletBalance = parseFloat(state.wallet) || 0;
+        solanaYield = parseFloat(state.solanaYield) || 0;
+        usdtYield = parseFloat(state.usdtYield) || 0;
+        nexusEngineRevenue = parseFloat(state.engine) || 1248.50;
+        nexusAdRevenue = parseFloat(state.ads) || 892.10;
+        nexusStakedAmount = parseFloat(state.staked) || 0;
+        airdropPot = parseFloat(state.pot) || 0;
+        bingRewardsPoints = parseInt(state.bing) || 0;
+        musicEarnings = parseFloat(state.music) || 0;
+        dailyStakingClaimed = state.daily || false;
+        masterWalletBound = state.isBound || false;
+        masterWalletAddress = state.address || "";
+        solWalletAddress = state.solAddress || "";
+        usdtWalletAddress = state.usdtAddress || "";
+        
+        // Populate inputs
+        setTimeout(() => {
+          const solInput = document.getElementById('sol-wallet-input');
+          const usdtInput = document.getElementById('usdt-wallet-input');
+          if (solInput) solInput.value = solWalletAddress;
+          if (usdtInput) usdtInput.value = usdtWalletAddress;
+        }, 500);
 
-      updateAllDisplays();
+      } catch (err) {
+        console.error("[SREYMARA] State initialization failed:", err);
+      } finally {
+        updateAllDisplays();
+      }
     }
 
     async function bindWallets() {
