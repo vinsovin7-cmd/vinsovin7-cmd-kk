@@ -117,9 +117,9 @@ fun WebViewContainer(
                 isFocusableInTouchMode = true
                 isClickable = true
                 
-                // Avoid forcing LAYER_TYPE_HARDWARE which causes MESA DRM render node errors in virtualized/emulator environments
+                // Set SOFTWARE layer type to avoid MESA DRM render node probing errors in virtualized/emulator environments
                 try {
-                    setLayerType(android.view.View.LAYER_TYPE_NONE, null)
+                    setLayerType(android.view.View.LAYER_TYPE_SOFTWARE, null)
                 } catch (_: Throwable) {}
 
                 @SuppressLint("JavascriptInterface")
@@ -130,13 +130,17 @@ fun WebViewContainer(
                 webChromeClient = object : WebChromeClient() {
                     override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
                         consoleMessage?.let {
+                            val msg = it.message() ?: ""
+                            if (msg.contains("MESA") || msg.contains("rendernode") || msg.contains("EGL") || msg.contains("Ashmem")) {
+                                return true
+                            }
                             val level = when (it.messageLevel()) {
                                 ConsoleMessage.MessageLevel.WARNING -> LogLevel.WARNING
                                 ConsoleMessage.MessageLevel.ERROR -> LogLevel.ERROR
                                 ConsoleMessage.MessageLevel.DEBUG -> LogLevel.DEBUG
                                 else -> LogLevel.INFO
                             }
-                            onLog(level, "${it.message()} (line ${it.lineNumber()})")
+                            onLog(level, "$msg (line ${it.lineNumber()})")
                         }
                         return true
                     }
