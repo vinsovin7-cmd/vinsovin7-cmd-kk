@@ -37,6 +37,7 @@ export const ExecutiveBottomTabBar: React.FC<ExecutiveBottomTabBarProps> = ({ cu
     { id: 'browser', label: 'BROWSER', icon: '🛡️', color: '#10B981', path: '#/browser' },
     { id: 'staking', label: 'STAKE 2X', icon: '💎', color: '#00F0FF', path: '#/staking' },
     { id: 'cinema', label: 'CINEMA', icon: '🎬', color: '#FFD700', path: '#/cinema' },
+    { id: 'whatsapp', label: 'WHATSAPP', icon: '🟢', color: '#25D366', path: '#/whatsapp' },
     { id: 'safepot', label: 'SAFE POT', icon: '💎', color: '#00F0FF', path: '#/safepot' },
     { id: 'ticker', label: 'TICKER', icon: '📈', color: '#FFD700', path: '#/ticker' },
     { id: 'balance_sync', label: 'SYNC', icon: '🔄', color: '#00F0FF', path: '#/balance-sync' },

@@ -1,21 +1,23 @@
 import React, { useState, useEffect } from 'react';
 
 export const RevenueTickerModal: React.FC = () => {
+  const [multiplier, setMultiplier] = useState<number>(3); // Default 3X Triple Boost
   const [totalRevenue, setTotalRevenue] = useState<number>(1485.50);
-  const [dripVelocity, setDripVelocity] = useState<number>(0.0035);
+  const [dripVelocity, setDripVelocity] = useState<number>(0.0035 * 3);
   const [todayYield, setTodayYield] = useState<number>(48.24);
-  const [streamVelocity, setStreamVelocity] = useState<string>('$0.0020 - $0.0050 / 5s');
+  const [streamVelocity, setStreamVelocity] = useState<string>('$0.0060 - $0.0150 / 5s (3X ACTIVE)');
   const [walletStatus, setWalletStatus] = useState<string>('ONLINE & ACTIVE');
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const delta = +(0.0020 + Math.random() * 0.0030).toFixed(4);
-      setDripVelocity(delta);
-      setTotalRevenue(prev => +(prev + delta).toFixed(4));
-      setTodayYield(prev => +(prev + delta).toFixed(4));
+      const baseDelta = +(0.0020 + Math.random() * 0.0030).toFixed(4);
+      const scaledDelta = +(baseDelta * multiplier).toFixed(4);
+      setDripVelocity(scaledDelta);
+      setTotalRevenue(prev => +(prev + scaledDelta).toFixed(4));
+      setTodayYield(prev => +(prev + scaledDelta).toFixed(4));
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [multiplier]);
 
   return (
     <div style={{ padding: '24px 20px', color: '#fff', maxWidth: '720px', margin: '0 auto', fontFamily: 'monospace, sans-serif' }}>
@@ -45,6 +47,32 @@ export const RevenueTickerModal: React.FC = () => {
               +80% TO MASTER WALLET
             </div>
           </div>
+        </div>
+
+        {/* Multiplier Boost Buttons */}
+        <div style={{ marginTop: '16px', paddingTop: '14px', borderTop: '1px solid rgba(212,175,55,0.2)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span style={{ fontSize: '11px', color: '#FFD700', fontWeight: 'bold' }}>EARNINGS ACCELERATOR:</span>
+          {([1, 2, 3] as const).map(m => (
+            <button
+              key={m}
+              onClick={() => {
+                setMultiplier(m);
+                setStreamVelocity(`$${(0.0020 * m).toFixed(4)} - $${(0.0050 * m).toFixed(4)} / 5s (${m}X ACTIVE)`);
+              }}
+              style={{
+                background: multiplier === m ? 'linear-gradient(135deg, #F59E0B, #EAB308)' : '#0F172A',
+                color: multiplier === m ? '#000' : '#94A3B8',
+                border: '1px solid #D4AF37',
+                padding: '6px 14px',
+                borderRadius: '8px',
+                fontWeight: 'bold',
+                fontSize: '11px',
+                cursor: 'pointer'
+              }}
+            >
+              {m}X {m === 2 ? 'DOUBLE REWARDS' : m === 3 ? 'TRIPLE REWARDS 🚀' : 'STANDARD'}
+            </button>
+          ))}
         </div>
       </div>
 

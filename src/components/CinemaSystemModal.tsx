@@ -3,7 +3,9 @@ import React, { useState, useEffect, useRef } from 'react';
 export interface StreamChannel {
   id: number;
   title: string;
-  category: 'khmer' | 'web3' | 'cyber' | 'global';
+  category: 'series' | 'khmer' | 'web3' | 'cyber' | 'global';
+  seriesName?: 'Legend of the Seeker' | 'Merlin' | 'The Gods Must Be Crazy' | 'Game of Thrones' | 'Khmer Action';
+  season?: string;
   youtubeId: string;
   icon: string;
   isLive: boolean;
@@ -11,26 +13,26 @@ export interface StreamChannel {
 }
 
 export const CINEMA_STREAMS: StreamChannel[] = [
-  // 1-5: Khmer Regional Streams
-  { id: 1, title: 'Hang Meas HDTV Official', category: 'khmer', youtubeId: 'dQw4w9WgXcQ', icon: '🇰🇭', isLive: true, desc: 'Phnom Penh Prime Entertainment Live' },
-  { id: 2, title: 'CTN Live Cambodia', category: 'khmer', youtubeId: '9xu_Vf3Y4yY', icon: '📡', isLive: true, desc: 'National News & Cultural Broadcast' },
-  { id: 3, title: 'Bayon TV Digital', category: 'khmer', youtubeId: 'x7nSj2HqH0A', icon: '🏛️', isLive: true, desc: 'Heritage & Traditional Khmer Cinema' },
-  { id: 4, title: 'PNN TV HD Broadcast', category: 'khmer', youtubeId: 'z8V2Gg_233o', icon: '🎭', isLive: true, desc: 'Regional Drama & Feature Films' },
-  { id: 5, title: 'Apsara Media Network', category: 'khmer', youtubeId: '7OPhS_O4V5M', icon: '📺', isLive: true, desc: 'Sihanoukville & Siem Reap Live Feeds' },
+  // 1-5: Legendary Action & Fantasy Series
+  { id: 1, title: 'Legend of the Seeker (Season 1)', category: 'series', seriesName: 'Legend of the Seeker', season: 'S01', youtubeId: 'dQw4w9WgXcQ', icon: '🗡️', isLive: true, desc: 'Seeker of Truth & Confessor Kahlan Epic Journey' },
+  { id: 2, title: 'Legend of the Seeker (Season 2)', category: 'series', seriesName: 'Legend of the Seeker', season: 'S02', youtubeId: '9xu_Vf3Y4yY', icon: '⚡', isLive: true, desc: 'Tears of Stone & The Underworld Battle' },
+  { id: 3, title: 'Merlin (Seasons 1 - 3)', category: 'series', seriesName: 'Merlin', season: 'S01-03', youtubeId: 'x7nSj2HqH0A', icon: '🧙‍♂️', isLive: true, desc: 'Camelot Sorcery, King Arthur & Great Dragon' },
+  { id: 4, title: 'Merlin (Seasons 4 - 5)', category: 'series', seriesName: 'Merlin', season: 'S04-05', youtubeId: 'z8V2Gg_233o', icon: '👑', isLive: true, desc: 'The Rise of Morgana & Camlann Battle' },
+  { id: 5, title: 'The Gods Must Be Crazy (Trilogy 1, 2, 3)', category: 'series', seriesName: 'The Gods Must Be Crazy', season: 'Trilogy', youtubeId: '7OPhS_O4V5M', icon: '🍾', isLive: true, desc: 'Classic Bushman Comedy & Coke Bottle Adventure' },
 
-  // 6-10: Web3 & Crypto Streams
-  { id: 6, title: 'Solana Breakpoint Livestream', category: 'web3', youtubeId: 'b8yZ004v0yU', icon: '🟣', isLive: true, desc: 'Global Developer Keynotes & Web3 Tech' },
-  { id: 7, title: 'CoinDesk Consensus 24/7', category: 'web3', youtubeId: '8A0U_qF9S98', icon: '🌐', isLive: true, desc: 'Macro Markets & Decentralized Finance' },
-  { id: 8, title: 'Bankless Web3 HQ', category: 'web3', youtubeId: 'M576zZg_5eE', icon: '💎', isLive: false, desc: 'Tokenomics, Staking & Multi-Chain Yields' },
-  { id: 9, title: 'Crypto Banter Live Trading', category: 'web3', youtubeId: 'A1W4fS1H_co', icon: '📊', isLive: true, desc: 'Real-time Altcoin & Solana Breakouts' },
-  { id: 10, title: 'DeFi Matrix Deep Dive', category: 'web3', youtubeId: 'fOGdb1H7zE0', icon: '⚡', isLive: false, desc: 'Yield Aggregation & Liquidity Vaults' },
+  // 6-10: Khmer Regional Streams & Action
+  { id: 6, title: 'Khmer Action Legends 4K', category: 'khmer', seriesName: 'Khmer Action', season: '4K', youtubeId: 'b8yZ004v0yU', icon: '🇰🇭', isLive: true, desc: 'Phnom Penh Prime Action Cinema & Martial Arts' },
+  { id: 7, title: 'CTN Live Cinema Cambodia', category: 'khmer', youtubeId: '8A0U_qF9S98', icon: '📡', isLive: true, desc: 'National News & Cultural Broadcast' },
+  { id: 8, title: 'Bayon TV Digital Heritage', category: 'khmer', youtubeId: 'M576zZg_5eE', icon: '🏛️', isLive: false, desc: 'Traditional Khmer Historical Drama' },
+  { id: 9, title: 'Game of Thrones Epic Tales', category: 'series', seriesName: 'Game of Thrones', season: 'S01-08', youtubeId: 'A1W4fS1H_co', icon: '🐉', isLive: true, desc: 'Westeros Iron Throne, Dragons & Night King' },
+  { id: 10, title: 'Hang Meas HDTV Feature', category: 'khmer', youtubeId: 'fOGdb1H7zE0', icon: '🎭', isLive: false, desc: 'Regional Feature Films & Live Shows' },
 
-  // 11-15: Cyberpunk Sci-Fi Cinema
-  { id: 11, title: 'Neo-Tokyo 2099 Cyber Lounge', category: 'cyber', youtubeId: 'y6120QOlsfU', icon: '🌆', isLive: true, desc: 'Synthwave & Dystopian Sci-Fi Cinema' },
-  { id: 12, title: 'Cyberpunk Lo-Fi Chill Beats', category: 'cyber', youtubeId: 'hB87Yx9Qp3U', icon: '🎧', isLive: true, desc: 'Blade Runner Aesthetic & Neon Soundscapes' },
-  { id: 13, title: 'Quantum Matrix Sci-Fi Shorts', category: 'cyber', youtubeId: 'bLURnScl6tE', icon: '🤖', isLive: false, desc: 'Decentralized AI Narratives & 4K Cinema' },
-  { id: 14, title: 'Neuromancer Underground Hub', category: 'cyber', youtubeId: 'fG7gO7H9y4Q', icon: '🕶️', isLive: true, desc: 'Dark Cyber Synth & Cinematic Loops' },
-  { id: 15, title: 'Neon Night Grid Simulator', category: 'cyber', youtubeId: 'tgbNymZ7vqY', icon: '🌃', isLive: false, desc: 'Futuristic High-Rise CGI & Audio Ramps' },
+  // 11-15: Web3 & Cyberpunk Sci-Fi Cinema
+  { id: 11, title: 'Solana Breakpoint Livestream', category: 'web3', youtubeId: 'y6120QOlsfU', icon: '🟣', isLive: true, desc: 'Global Developer Keynotes & Web3 Tech' },
+  { id: 12, title: 'CoinDesk Consensus 24/7', category: 'web3', youtubeId: 'hB87Yx9Qp3U', icon: '🌐', isLive: true, desc: 'Macro Markets & Decentralized Finance' },
+  { id: 13, title: 'Neo-Tokyo 2099 Cyber Lounge', category: 'cyber', youtubeId: 'bLURnScl6tE', icon: '🌆', isLive: false, desc: 'Synthwave & Dystopian Sci-Fi Cinema' },
+  { id: 14, title: 'Cyberpunk Lo-Fi Chill Beats', category: 'cyber', youtubeId: 'fG7gO7H9y4Q', icon: '🎧', isLive: true, desc: 'Blade Runner Aesthetic & Neon Soundscapes' },
+  { id: 15, title: 'Quantum Matrix Sci-Fi Shorts', category: 'cyber', youtubeId: 'tgbNymZ7vqY', icon: '🤖', isLive: false, desc: 'Decentralized AI Narratives & 4K Cinema' },
 
   // 16-20: Global Films & Documentaries
   { id: 16, title: 'Bloomberg Originals Global', category: 'global', youtubeId: 'C0DPdy98JJ4', icon: '🌍', isLive: true, desc: 'Global Wealth & Geopolitics Cinema' },

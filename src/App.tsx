@@ -13,6 +13,7 @@ import { WalletBalanceSyncModal } from './components/WalletBalanceSyncModal';
 import { AnimateYieldDripModal } from './components/AnimateYieldDripModal';
 import { TransactionLogModal } from './components/TransactionLogModal';
 import { CinemaSystemModal } from './components/CinemaSystemModal';
+import { WhatsAppAutomationModal } from './components/WhatsAppAutomationModal';
 
 // Lazy load full page routes to optimize memory and prevent ANR
 const ExecutiveDashboard = lazy(() => import('./pages/ExecutiveDashboard').then(m => ({ default: m.ExecutiveDashboard })));
@@ -50,6 +51,13 @@ export const App: React.FC = () => {
         return (
           <OverlayView onExit={() => setCurrentTab('dashboard')} title="🎬 CINEMA (20 CHANNELS) & STREAMING ENGINE">
             <CinemaSystemModal defaultSubTab="cinema" />
+          </OverlayView>
+        );
+
+      case 'whatsapp':
+        return (
+          <OverlayView onExit={() => setCurrentTab('dashboard')} title="🟢 WHATSAPP BUSINESS GRAPH API & CONVERSATIONAL AUTOMATION">
+            <WhatsAppAutomationModal />
           </OverlayView>
         );
 
