@@ -117,9 +117,9 @@ fun WebViewContainer(
                 isFocusableInTouchMode = true
                 isClickable = true
                 
-                // Set SOFTWARE layer type to avoid MESA DRM render node probing errors in virtualized/emulator environments
+                // Enable HARDWARE layer type for optimal performance and smooth rendering
                 try {
-                    setLayerType(android.view.View.LAYER_TYPE_SOFTWARE, null)
+                    setLayerType(android.view.View.LAYER_TYPE_HARDWARE, null)
                 } catch (_: Throwable) {}
 
                 @SuppressLint("JavascriptInterface")

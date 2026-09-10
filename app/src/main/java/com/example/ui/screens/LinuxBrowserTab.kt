@@ -374,7 +374,7 @@ fun LinuxBrowserTab(viewModel: MiniAppViewModel) {
                         settings.allowContentAccess = true
 
                         try {
-                            setLayerType(android.view.View.LAYER_TYPE_SOFTWARE, null)
+                            setLayerType(android.view.View.LAYER_TYPE_HARDWARE, null)
                         } catch (_: Throwable) {}
 
                         webViewClient = object : WebViewClient() {
