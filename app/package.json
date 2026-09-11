@@ -8,7 +8,7 @@
     "bot": "node bot.js"
   },
   "dependencies": {
-    "@google/genai": "^0.1.1",
+    "@google/genai": "^0.2.0",
     "@solana/web3.js": "^1.91.8",
     "@supabase/supabase-js": "^2.43.0",
     "axios": "^1.7.2",
