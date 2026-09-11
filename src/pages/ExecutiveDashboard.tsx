@@ -62,17 +62,17 @@ export const ExecutiveDashboard: React.FC = () => {
   };
 
   return (
-    <div style={{ background: '#0a0a0c', color: '#fff', minHeight: '100vh', padding: '24px', fontFamily: 'sans-serif' }}>
+    <div style={{ background: '#0a0a0c', color: '#fff', minHeight: '100vh', padding: '24px 32px', fontFamily: 'sans-serif', maxWidth: '1800px', margin: '0 auto' }}>
       
       {/* Executive Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #D4AF37', paddingBottom: '16px' }}>
-        <h1 style={{ color: '#D4AF37', margin: 0, fontSize: '20px', letterSpacing: '1px' }}>SREYMARA EXECUTIVE AD ENGINE HUB</h1>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <span style={{ color: '#00FFFF', fontSize: '12px', fontWeight: 'bold' }}>● LIVE REALTIME SYNC</span>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #D4AF37', paddingBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+        <h1 style={{ color: '#D4AF37', margin: 0, fontSize: '22px', fontWeight: 'bold', letterSpacing: '1px' }}>SREYMARA EXECUTIVE AD ENGINE HUB</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <span style={{ color: '#00FFFF', fontSize: '13px', fontWeight: 'bold' }}>● LIVE REALTIME SYNC</span>
           <select 
             value={selectedCountry} 
             onChange={(e) => setSelectedCountry(e.target.value)}
-            style={{ background: '#1a1a24', color: '#fff', border: '1px solid #D4AF37', padding: '8px', borderRadius: '4px', fontSize: '12px' }}
+            style={{ background: '#1a1a24', color: '#fff', border: '1px solid #D4AF37', padding: '8px 14px', borderRadius: '6px', fontSize: '12px', fontWeight: 'bold' }}
           >
             <option value="GLOBAL">Global Revenue View</option>
             <option value="USA">United States (USD)</option>
@@ -83,77 +83,82 @@ export const ExecutiveDashboard: React.FC = () => {
       </div>
 
       {/* Balance & Automated Settlement Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', marginTop: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', marginTop: '24px' }}>
         
-        <div style={{ background: '#12121c', border: '1px solid rgba(212, 175, 55, 0.4)', padding: '20px', borderRadius: '8px' }}>
-          <h3 style={{ fontSize: '13px', color: '#94A3B8', margin: '0 0 8px 0' }}>PORTFOLIO USDT BALANCE</h3>
-          <p style={{ fontSize: '28px', color: '#D4AF37', fontWeight: 'bold', margin: '0 0 4px 0' }}>${usdtBalance.toFixed(4)} USDT</p>
-          <small style={{ color: '#64748B', fontSize: '10px' }}>Settled via Adyen / Rapyd / Tipalti</small>
+        <div style={{ background: '#12121c', border: '1px solid rgba(212, 175, 55, 0.4)', padding: '24px', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
+          <h3 style={{ fontSize: '13px', color: '#94A3B8', margin: '0 0 8px 0', letterSpacing: '0.5px' }}>PORTFOLIO USDT BALANCE</h3>
+          <p style={{ fontSize: '32px', color: '#D4AF37', fontWeight: '900', margin: '0 0 6px 0' }}>${usdtBalance.toFixed(4)} USDT</p>
+          <small style={{ color: '#64748B', fontSize: '11px' }}>Settled via Adyen / Rapyd / Tipalti</small>
         </div>
 
-        <div style={{ background: '#12121c', border: '1px solid rgba(0, 255, 255, 0.4)', padding: '20px', borderRadius: '8px' }}>
-          <h3 style={{ fontSize: '13px', color: '#94A3B8', margin: '0 0 8px 0' }}>SOLANA SAFE POT (SOL)</h3>
-          <p style={{ fontSize: '28px', color: '#00FFFF', fontWeight: 'bold', margin: '0 0 10px 0' }}>{solBalance.toFixed(2)} SOL</p>
+        <div style={{ background: '#12121c', border: '1px solid rgba(0, 255, 255, 0.4)', padding: '24px', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
+          <h3 style={{ fontSize: '13px', color: '#94A3B8', margin: '0 0 8px 0', letterSpacing: '0.5px' }}>SOLANA SAFE POT (SOL)</h3>
+          <p style={{ fontSize: '32px', color: '#00FFFF', fontWeight: '900', margin: '0 0 12px 0' }}>{solBalance.toFixed(2)} SOL</p>
           <button 
             onClick={handleSolToUsdtSwap}
-            style={{ background: 'linear-gradient(45deg, #D4AF37, #FF9900)', border: 'none', padding: '8px 14px', color: '#000', fontWeight: 'bold', cursor: 'pointer', borderRadius: '6px', fontSize: '11px' }}
+            style={{ background: 'linear-gradient(45deg, #D4AF37, #FF9900)', border: 'none', padding: '10px 18px', color: '#000', fontWeight: 'bold', cursor: 'pointer', borderRadius: '8px', fontSize: '12px' }}
           >
             SWAP 1 SOL TO USDT ($162.40)
           </button>
         </div>
 
-        <div style={{ background: '#12121c', border: '1px solid rgba(16, 185, 129, 0.4)', padding: '20px', borderRadius: '8px' }}>
-          <h3 style={{ fontSize: '13px', color: '#94A3B8', margin: '0 0 8px 0' }}>USDC & ETH REVENUE</h3>
-          <p style={{ fontSize: '18px', color: '#10B981', fontWeight: 'bold', margin: '0 0 4px 0' }}>{usdcBalance.toFixed(2)} USDC</p>
-          <p style={{ fontSize: '16px', color: '#A855F7', fontWeight: 'bold', margin: 0 }}>{ethBalance.toFixed(4)} ETH</p>
-          <small style={{ color: '#64748B', fontSize: '10px' }}>Multi-Chain Direct Yield Pipeline</small>
+        <div style={{ background: '#12121c', border: '1px solid rgba(16, 185, 129, 0.4)', padding: '24px', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
+          <h3 style={{ fontSize: '13px', color: '#94A3B8', margin: '0 0 8px 0', letterSpacing: '0.5px' }}>USDC & ETH REVENUE</h3>
+          <p style={{ fontSize: '20px', color: '#10B981', fontWeight: 'bold', margin: '0 0 4px 0' }}>{usdcBalance.toFixed(2)} USDC</p>
+          <p style={{ fontSize: '18px', color: '#A855F7', fontWeight: 'bold', margin: 0 }}>{ethBalance.toFixed(4)} ETH</p>
+          <small style={{ color: '#64748B', fontSize: '11px', marginTop: '4px', display: 'block' }}>Multi-Chain Direct Yield Pipeline</small>
         </div>
 
       </div>
 
-      {/* Multi-Bank Payout & Virtual Card BaaS Toggle */}
-      <div style={{ background: '#12121c', border: '1px solid #333', padding: '20px', borderRadius: '8px', marginTop: '24px' }}>
-        <h3 style={{ color: '#D4AF37', fontSize: '14px', margin: '0 0 6px 0' }}>MULTI-BANK PAYOUT TOGGLE & VIRTUAL CARD BAAS</h3>
-        <p style={{ fontSize: '12px', color: '#CBD5E1', margin: '0 0 12px 0' }}>Select active settlement channel for automated revenue routing:</p>
+      {/* Multi-Column Desktop Grid for Bank Payout & Dual Pipeline Stream */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 1fr)', gap: '24px', marginTop: '24px' }}>
+        
+        {/* Multi-Bank Payout & Virtual Card BaaS Toggle */}
+        <div style={{ background: '#12121c', border: '1px solid #333', padding: '24px', borderRadius: '12px' }}>
+          <h3 style={{ color: '#D4AF37', fontSize: '16px', margin: '0 0 6px 0', fontWeight: 'bold' }}>MULTI-BANK PAYOUT TOGGLE & VIRTUAL CARD BAAS</h3>
+          <p style={{ fontSize: '12px', color: '#CBD5E1', margin: '0 0 16px 0' }}>Select active settlement channel for automated revenue routing:</p>
 
-        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-          {['ZENUS_BANK', 'AIRWALLEX', 'ADYEN_GLOBAL', 'RAPYD_PAYOUT', 'TIPALTI'].map((provider) => (
-            <button
-              key={provider}
-              onClick={() => setActiveBankToggle(provider)}
-              style={{
-                padding: '10px 16px',
-                background: activeBankToggle === provider ? '#D4AF37' : '#1a1a24',
-                color: activeBankToggle === provider ? '#000' : '#fff',
-                border: '1px solid #D4AF37',
-                fontWeight: 'bold',
-                borderRadius: '6px',
-                fontSize: '11px',
-                cursor: 'pointer'
-              }}
-            >
-              {provider.replace('_', ' ')} {activeBankToggle === provider ? '(ACTIVE)' : ''}
-            </button>
-          ))}
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '16px' }}>
+            {['ZENUS_BANK', 'AIRWALLEX', 'ADYEN_GLOBAL', 'RAPYD_PAYOUT', 'TIPALTI'].map((provider) => (
+              <button
+                key={provider}
+                onClick={() => setActiveBankToggle(provider)}
+                style={{
+                  padding: '10px 16px',
+                  background: activeBankToggle === provider ? '#D4AF37' : '#1a1a24',
+                  color: activeBankToggle === provider ? '#000' : '#fff',
+                  border: '1px solid #D4AF37',
+                  fontWeight: 'bold',
+                  borderRadius: '6px',
+                  fontSize: '11px',
+                  cursor: 'pointer'
+                }}
+              >
+                {provider.replace('_', ' ')} {activeBankToggle === provider ? '(ACTIVE)' : ''}
+              </button>
+            ))}
+          </div>
+
+          <div style={{ padding: '16px', background: '#0a0a0c', borderRadius: '8px', border: '1px dashed #555' }}>
+            <h4 style={{ margin: '0 0 6px 0', fontSize: '13px', color: '#FFF' }}>ISSUED VIRTUAL CARD STATUS (BAAS VERIFIED)</h4>
+            <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#94A3B8' }}>Card Number: <strong style={{ color: '#FFF' }}>**** **** **** 8821</strong> | {activeBankToggle.replace('_', ' ')}</p>
+            <p style={{ margin: 0, fontSize: '12px', color: '#94A3B8' }}>KYC/AML Identity Status: <span style={{ color: '#00FF00', fontWeight: 'bold' }}>VERIFIED & INDEPENDENT</span></p>
+          </div>
         </div>
 
-        <div style={{ marginTop: '16px', padding: '14px', background: '#0a0a0c', borderRadius: '6px', border: '1px dashed #555' }}>
-          <h4 style={{ margin: '0 0 6px 0', fontSize: '12px', color: '#FFF' }}>ISSUED VIRTUAL CARD STATUS (BAAS VERIFIED)</h4>
-          <p style={{ margin: '0 0 4px 0', fontSize: '11px', color: '#94A3B8' }}>Card Number: <strong style={{ color: '#FFF' }}>**** **** **** 8821</strong> | {activeBankToggle.replace('_', ' ')}</p>
-          <p style={{ margin: 0, fontSize: '11px', color: '#94A3B8' }}>KYC/AML Identity Status: <span style={{ color: '#00FF00', fontWeight: 'bold' }}>VERIFIED & INDEPENDENT</span></p>
+        {/* Dual Pipeline Live Stream */}
+        <div style={{ background: '#12121c', padding: '24px', borderRadius: '12px', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
+          <h3 style={{ color: '#00FFFF', fontSize: '16px', margin: '0 0 14px 0', fontWeight: 'bold' }}>DUAL-PIPELINE MONETIZATION STREAM (SSP / DSP REALTIME)</h3>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+            {liveImpressions.map((item, idx) => (
+              <li key={idx} style={{ marginBottom: '10px', padding: '10px 14px', background: '#0a0a0f', borderRadius: '6px', fontSize: '12px', borderLeft: item.pipeline_type === 'WEB3_DSP' ? '4px solid #38BDF8' : '4px solid #EC4899' }}>
+                <span style={{ color: item.pipeline_type === 'WEB3_DSP' ? '#38BDF8' : '#EC4899', fontWeight: 'bold' }}>[{item.pipeline_type}]</span> Module: <strong style={{ color: '#FFF' }}>{item.source_module}</strong> | Country: {item.country_code} | Yield: <span style={{ color: '#10B981', fontWeight: 'bold' }}>+${item.cpm_earned} CPM</span>
+              </li>
+            ))}
+          </ul>
         </div>
-      </div>
 
-      {/* Dual Pipeline Live Stream */}
-      <div style={{ marginTop: '24px', background: '#12121c', padding: '20px', borderRadius: '8px', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
-        <h3 style={{ color: '#00FFFF', fontSize: '14px', margin: '0 0 12px 0' }}>DUAL-PIPELINE MONETIZATION STREAM (SSP / DSP REALTIME)</h3>
-        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-          {liveImpressions.map((item, idx) => (
-            <li key={idx} style={{ marginBottom: '8px', padding: '8px 12px', background: '#0a0a0f', borderRadius: '4px', fontSize: '11px', borderLeft: item.pipeline_type === 'WEB3_DSP' ? '3px solid #38BDF8' : '3px solid #EC4899' }}>
-              <span style={{ color: item.pipeline_type === 'WEB3_DSP' ? '#38BDF8' : '#EC4899', fontWeight: 'bold' }}>[{item.pipeline_type}]</span> Module: <strong style={{ color: '#FFF' }}>{item.source_module}</strong> | Country: {item.country_code} | Yield: <span style={{ color: '#10B981', fontWeight: 'bold' }}>+${item.cpm_earned} CPM</span>
-            </li>
-          ))}
-        </ul>
       </div>
 
     </div>

@@ -31,8 +31,8 @@ export const App: React.FC = () => {
       case 'browser':
         // LINUS ANTI-DETECT BROWSER & MAIL.COM AUTOPILOT (Exact Screenshot Match)
         return (
-          <OverlayView onExit={() => setCurrentTab('dashboard')} title="🛡️ LINUS AI ANTI-DETECT ENGINE & PROXY MATRIX (86.109.86.42)">
-            <div style={{ padding: '16px' }}>
+          <OverlayView onExit={() => setCurrentTab('dashboard')} title="🛡️ MAIL.COM & IX BROWSER PARADISE (GOOGLE AI STUDIO CORE)">
+            <div style={{ padding: '0px', width: '100%' }}>
               <LinusBrowserManager />
             </div>
           </OverlayView>
@@ -282,6 +282,68 @@ export const App: React.FC = () => {
         <FloatingAirdropGiftBox />
 
         <div style={{ paddingBottom: '75px', minHeight: '100vh', background: '#04060B' }}>
+          
+          {/* Executive Top Action Bar: Desktop View Toggle & AI Email Pilot */}
+          <div style={{
+            padding: '12px 20px',
+            background: 'linear-gradient(180deg, #090D1A 0%, #04060B 100%)',
+            borderBottom: '1px solid rgba(212, 175, 55, 0.3)',
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '12px'
+          }}>
+            <button
+              onClick={() => {
+                const el = document.documentElement;
+                if (!document.fullscreenElement) {
+                  el.requestFullscreen?.().catch(() => {});
+                } else {
+                  document.exitFullscreen?.().catch(() => {});
+                }
+              }}
+              style={{
+                background: 'linear-gradient(90deg, #4F46E5, #6366F1)',
+                border: 'none',
+                borderRadius: '8px',
+                color: '#FFFFFF',
+                padding: '12px',
+                fontWeight: '800',
+                fontSize: '12px',
+                letterSpacing: '1px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                boxShadow: '0 4px 14px rgba(99, 102, 241, 0.3)'
+              }}
+            >
+              💻 TOGGLE DESKTOP VIEW
+            </button>
+
+            <button
+              onClick={() => setCurrentTab('browser')}
+              style={{
+                background: 'linear-gradient(90deg, #059669, #10B981)',
+                border: 'none',
+                borderRadius: '8px',
+                color: '#FFFFFF',
+                padding: '12px',
+                fontWeight: '800',
+                fontSize: '12px',
+                letterSpacing: '1px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                boxShadow: '0 4px 14px rgba(16, 185, 129, 0.3)'
+              }}
+            >
+              ✉️ AI EMAIL PILOT
+            </button>
+          </div>
+
           {/* Executive Sreymara Ads Banner */}
           <div style={{ padding: '8px 14px' }}>
             <ExecutiveSreymaraAds boundWalletAddress="5uYJ3iVSCnCTVA7Nfr25JTCmE8LPyaAziCNGi1P55DRL" />
